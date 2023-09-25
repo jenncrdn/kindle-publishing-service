@@ -1,1 +1,14 @@
-PARTICIPANTS: use this file for creating the remove book from catalog diagram in mastery task 01
+@startuml
+User -> ECS: HTTP Request
+ECS -> RemoveBookFromCatalogActivity: execute(RemoveBookFromCatalogRequest)
+RemoveBookFromCatalogActivity -> CatalogDao: removeBookFromCatalog(bookId)
+CatalogDao -> DynamoDB: setInactive(boolean)
+alt [If bookId does not exist or book is inactive]
+    CatalogDao -> RemoveBookFromCatalogActivity: BookNotFoundException
+    RemoveBookFromCatalogActivity -> ECS: BookNotFoundException
+    ECS -> User: BookNotFoundException
+    end
+RemoveBookFromCatalogActivity -> ECS: RemoveBookFromCatalogResponse
+ECS -> User: 200 Response
+
+@enduml
