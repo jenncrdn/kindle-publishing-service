@@ -72,4 +72,40 @@ public class CatalogDao {
             throw new BookNotFoundException(String.format("No book found for id: %s", bookId));
         }
     }
+    public CatalogItemVersion createOrUpdateBook(KindleFormattedBook kindleFormattedBook) {
+        CatalogItemVersion book = new CatalogItemVersion();
+
+        if (kindleFormattedBook.getBookId() == null){
+            String newBookId = KindlePublishingUtils.generateBookId();
+            book.setBookId(newBookId);
+            book.setAuthor(kindleFormattedBook.getAuthor());
+            book.setGenre(kindleFormattedBook.getGenre());
+            book.setText(kindleFormattedBook.getText());
+            book.setAuthor(kindleFormattedBook.getAuthor());
+            book.setTitle(kindleFormattedBook.getTitle());
+            book.setVersion(1);
+
+            dynamoDbMapper.save(book);
+            return book;
+        }
+        validateBookExists(kindleFormattedBook.getBookId());
+        CatalogItemVersion existingBook = getLatestVersionOfBook(kindleFormattedBook.getBookId());
+        CatalogItemVersion newBook = getBookFromCatalog(kindleFormattedBook.getBookId());
+        int version = existingBook.getVersion();
+
+
+        int newVersion = version + 1;
+        existingBook.setInactive(true);
+        newBook.setTitle(kindleFormattedBook.getTitle());
+        newBook.setAuthor(kindleFormattedBook.getAuthor());
+        newBook.setGenre(kindleFormattedBook.getGenre());
+        newBook.setText(kindleFormattedBook.getText());
+        newBook.setAuthor(kindleFormattedBook.getAuthor());
+        newBook.setBookId(kindleFormattedBook.getBookId());
+        newBook.setVersion(newVersion);
+        dynamoDbMapper.save(existingBook);
+        dynamoDbMapper.save(newBook);
+
+        return newBook;
+    }
 }

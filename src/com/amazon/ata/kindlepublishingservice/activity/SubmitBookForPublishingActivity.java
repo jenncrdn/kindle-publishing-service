@@ -58,18 +58,13 @@ public class SubmitBookForPublishingActivity {
         final BookPublishRequest bookPublishRequest = BookPublishRequestConverter.toBookPublishRequest(request);
 
         // If there is a book ID in the request, validate it exists in our catalog
-        if (request.getBookId() != null) {
-            try {
-                catalogDao.validateBookExists(request.getBookId());
-            } catch (BookNotFoundException e) {
-                throw new BookNotFoundException("Book with id: " + request.getBookId() + " was not found.");
-            }
-        } else {
-            // Submit the BookPublishRequest for processing
-            bookPublishRequestManager.addBookPublishRequest(bookPublishRequest);
+        if (bookPublishRequest.getBookId() != null) {
+            catalogDao.validateBookExists(bookPublishRequest.getBookId());
         }
 
-        PublishingStatusItem item =  publishingStatusDao.setPublishingStatus(bookPublishRequest.getPublishingRecordId(),
+        // Submit the BookPublishRequest for processing
+        bookPublishRequestManager.addBookPublishRequest(bookPublishRequest);
+        PublishingStatusItem item = publishingStatusDao.setPublishingStatus(bookPublishRequest.getPublishingRecordId(),
                 PublishingRecordStatus.QUEUED,
                 bookPublishRequest.getBookId());
 

@@ -26,12 +26,12 @@ public class BookPublisher {
      * Instantiates a new BookPublisher object.
      *
      * @param scheduledExecutorService will schedule publishing tasks
-     * @param publishTask the task that should be scheduled to publish books
+     * @param bookPublishTask the task that should be scheduled to publish books
      */
     @Inject
     public BookPublisher(ScheduledExecutorService scheduledExecutorService,
-                         Runnable publishTask) {
-        this.publishTask = publishTask;
+                         Runnable bookPublishTask) {
+        this.publishTask = bookPublishTask;
         this.scheduledExecutorService = scheduledExecutorService;
     }
 
